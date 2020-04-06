@@ -8,37 +8,37 @@
 
 import UIKit
 
-struct TZIndicatorThemeConfig {
+public struct TZIndicatorThemeConfig {
     /**CGFont for the labels.**Default is Helvitica***/
-    var font: CGFont = CGFont("Helvetica" as CFString)!
+    public var font: CGFont = CGFont("Helvetica" as CFString)!
     
     /**Font Size for the labels. **Default is 12** */
-    var fontSize : CGFloat = 12.0
+    public var fontSize : CGFloat = 12.0
     
     /**Color for the inactive graphics like indicator or text.**Default is gray***/
-    var inactiveColor = UIColor.gray
+    public var inactiveColor = UIColor.gray
     
     /**Color for the active graphics like indicator or text.**Default is white***/
-    var activeColor = UIColor.white
+    public var activeColor = UIColor.white
     
     /**Color for the completed graphics like indicator or text.**Default is green***/
-    var completedColor = UIColor.green
+    public var completedColor = UIColor.green
     
     /**Radius of the indicator drawn.**Default is 5***/
-    var indicatorRadius: CGFloat = 5
+    public var indicatorRadius: CGFloat = 5
     
     /**LineWidth of the progress bar drawn.**Default is 3***/
-    var lineWidth: CGFloat = 3
+    public var lineWidth: CGFloat = 3
     
     /** Time Interval for Stroke Animation Duration. **Default is 0.75** */
-    var strokeAnimationDuration: CFTimeInterval = 0.75
+    public var strokeAnimationDuration: CFTimeInterval = 0.75
     
-    init(){}
+    public init(){}
 }
 
-class TZIndicatorProgressView: UIView {
-    var theme = TZIndicatorThemeConfig()
-    var labels: [String] = [] {
+open class TZIndicatorProgressView: UIView {
+    open var theme = TZIndicatorThemeConfig()
+    open var labels: [String] = [] {
         didSet {
             setupLayers()
         }
@@ -151,7 +151,7 @@ class TZIndicatorProgressView: UIView {
     }
     
     // MARK: -
-    func move(to index: Int) {
+    public func move(to index: Int) {
         previousCompletedIndex = completedIndex
         currentIndex = index
         updateLayers()
@@ -199,7 +199,7 @@ class TZIndicatorProgressView: UIView {
         return animation
     }
     
-    func nextIndex() {
+    public func nextIndex() {
         previousCompletedIndex = completedIndex
         currentIndex += 1
         updateLayers()
