@@ -212,8 +212,8 @@ open class TZIndicatorProgressView: UIView {
             let completedEnd = CGFloat(completedIndex)/CGFloat(componentCount)
             let completedLayerAnimation = pathAnimation
             completedLayerAnimation.toValue = completedEnd
-            if let previousIndex = previousCompletedIndex {
-                completedLayerAnimation.fromValue = CGFloat(previousIndex)/CGFloat(componentCount)
+            if let previousCIndex = previousCompletedIndex {
+                completedLayerAnimation.fromValue = CGFloat(previousCIndex)/CGFloat(componentCount)
             }
             completedLayer.add(completedLayerAnimation, forKey: "strokeEndAnimation")
             for i in 0...completedIndex {
@@ -229,7 +229,9 @@ open class TZIndicatorProgressView: UIView {
         let activeLayerAnimation = pathAnimation
         let activeEnd = CGFloat(currentIndex)/CGFloat(componentCount)
         activeLayerAnimation.toValue = activeEnd
-        activeLayerAnimation.fromValue = CGFloat(previousIndex)/CGFloat(componentCount)
+        if let index = previousIndex {
+            activeLayerAnimation.fromValue = CGFloat(index)/CGFloat(componentCount)
+        }
         activeLayer.add(activeLayerAnimation, forKey: "strokeEndAnimation")
         indicatorLayers[currentIndex].fillColor = theme.activeColor.cgColor
         textLayers[currentIndex].foregroundColor = theme.activeColor.cgColor
