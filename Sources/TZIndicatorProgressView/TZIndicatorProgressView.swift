@@ -42,7 +42,6 @@ open class TZIndicatorProgressView: UIView {
         didSet {
             resetLayers()
             setupLayers()
-            updateLayers()
         }
     }
     private var _currentIndex = 0
@@ -76,6 +75,7 @@ open class TZIndicatorProgressView: UIView {
         drawCompletedLayer()
         drawIndicatorLayer()
         drawLabels()
+        updateLayers()
     }
     
     private func resetLayers() {
@@ -260,6 +260,6 @@ open class TZIndicatorProgressView: UIView {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        updateLayers()
+        setupLayers()
     }
 }
