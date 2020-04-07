@@ -43,6 +43,10 @@ open class TZIndicatorProgressView: UIView {
             setupLayers()
         }
     }
+    private var _currentIndex = 0
+    open var currentIndex : Int {
+        return _currentIndex
+    }
     
     private var componentWidth : CGFloat {
         return self.bounds.width / CGFloat(labels.count)
@@ -56,7 +60,7 @@ open class TZIndicatorProgressView: UIView {
     private let completedLayer = CAShapeLayer()
     private var indicatorLayers : [CAShapeLayer] = []
     private var textLayers: [CATextLayer] = []
-    private var currentIndex = 0
+    
     private var previousCompletedIndex: Int?
     private var completedIndex: Int {
         return currentIndex - 1
@@ -154,7 +158,10 @@ open class TZIndicatorProgressView: UIView {
     // MARK: -
     public func move(to index: Int) {
         previousCompletedIndex = completedIndex
-        currentIndex = index
+        if index == _currentIndex {
+            return
+        }
+        _currentIndex = index
         updateLayers()
     }
     
@@ -202,7 +209,7 @@ open class TZIndicatorProgressView: UIView {
     
     public func nextIndex() {
         previousCompletedIndex = completedIndex
-        currentIndex += 1
+        _currentIndex += 1
         updateLayers()
     }
 
