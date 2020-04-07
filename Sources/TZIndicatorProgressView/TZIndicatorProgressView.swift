@@ -73,6 +73,9 @@ open class TZIndicatorProgressView: UIView {
     }
     
     private func setupLayers() {
+        if self.labels.count == 0 {
+            return
+        }
         createIndicatorCenters()
         drawInactiveLayer()
         drawActiveLayer()
