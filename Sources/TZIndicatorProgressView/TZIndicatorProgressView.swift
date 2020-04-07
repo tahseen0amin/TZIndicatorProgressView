@@ -74,7 +74,8 @@ open class TZIndicatorProgressView: UIView {
     private func createIndicatorCenters(){
         let componentHeight = self.bounds.height
         let tempComponentBox = CGRect(x: 0, y: 0, width: componentWidth, height: componentHeight)
-        let firstIndicatorCenter = CGPoint(x: tempComponentBox.midX, y: tempComponentBox.midY)
+        let firstIndicatorCenter = CGPoint(x: tempComponentBox.midX,
+                                           y: tempComponentBox.midY - theme.indicatorRadius)
         
         indicatorCenters.removeAll()
         for i in 0..<labels.count {
