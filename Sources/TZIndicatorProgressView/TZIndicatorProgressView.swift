@@ -37,7 +37,11 @@ public struct TZIndicatorThemeConfig {
 }
 
 open class TZIndicatorProgressView: UIView {
-    open var theme = TZIndicatorThemeConfig()
+    open var theme = TZIndicatorThemeConfig(){
+       didSet {
+            setupLayers()
+        }
+    }
     open var labels: [String] = [] {
         didSet {
             resetLayers()
@@ -79,7 +83,6 @@ open class TZIndicatorProgressView: UIView {
     }
     
     private func resetLayers() {
-        self.layer.sublayers?.removeAll()
         self.indicatorLayers.removeAll()
         self.textLayers.removeAll()
     }
@@ -155,6 +158,7 @@ open class TZIndicatorProgressView: UIView {
                 let layer = indicatorLayers[index]
                 let point = indicatorCenters[index]
                 layer.path = UIBezierPath(arcCenter: point, radius: theme.indicatorRadius, startAngle: CGFloat(0.0), endAngle: CGFloat(Double.pi * 2), clockwise: true).cgPath
+                layer.fillColor = theme.inactiveColor.cgColor
             }
         }
         
@@ -189,6 +193,8 @@ open class TZIndicatorProgressView: UIView {
                 let centrePoint = indicatorCenters[index]
                 let updatedPoint = CGPoint(x: centrePoint.x - (componentWidth/2), y: centrePoint.y + 10)
                 textLayer.string = string
+                textLayer.font = theme.font
+                textLayer.fontSize = theme.fontSize
                 textLayer.frame = CGRect(origin: updatedPoint, size: CGSize(width: componentWidth, height: 18))
             }
         }
