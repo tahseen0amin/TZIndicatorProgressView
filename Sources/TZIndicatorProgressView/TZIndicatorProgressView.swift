@@ -40,7 +40,9 @@ open class TZIndicatorProgressView: UIView {
     open var theme = TZIndicatorThemeConfig()
     open var labels: [String] = [] {
         didSet {
+            resetLayers()
             setupLayers()
+            updateLayers()
         }
     }
     private var _currentIndex = 0
@@ -62,6 +64,7 @@ open class TZIndicatorProgressView: UIView {
     private var textLayers: [CATextLayer] = []
     
     private var previousCompletedIndex: Int?
+    private var previousIndex: Int?
     private var completedIndex: Int {
         return currentIndex - 1
     }
@@ -75,6 +78,12 @@ open class TZIndicatorProgressView: UIView {
         drawLabels()
     }
     
+    private func resetLayers() {
+        self.layer.sublayers?.removeAll()
+        self.indicatorLayers.removeAll()
+        self.textLayers.removeAll()
+    }
+        
     private func createIndicatorCenters(){
         let componentHeight = self.bounds.height
         let tempComponentBox = CGRect(x: 0, y: 0, width: componentWidth, height: componentHeight)
@@ -98,7 +107,9 @@ open class TZIndicatorProgressView: UIView {
         inactiveLayer.lineWidth = theme.lineWidth
         inactiveLayer.strokeEnd = 1
         inactiveLayer.path = path
-        self.layer.addSublayer(inactiveLayer)
+        if inactiveLayer.superlayer == nil {
+            self.layer.addSublayer(inactiveLayer)
+        }
     }
     
     private func drawActiveLayer(){
@@ -109,7 +120,10 @@ open class TZIndicatorProgressView: UIView {
         activeLayer.strokeStart = 0
         activeLayer.strokeEnd = 0
         activeLayer.path = path
-        self.layer.addSublayer(activeLayer)
+        if activeLayer.superlayer == nil {
+            self.layer.addSublayer(activeLayer)
+        }
+        
     }
     
     private func drawCompletedLayer(){
@@ -120,39 +134,66 @@ open class TZIndicatorProgressView: UIView {
         completedLayer.strokeStart = 0
         completedLayer.strokeEnd = 0
         completedLayer.path = path
-        self.layer.addSublayer(completedLayer)
+        if completedLayer.superlayer == nil {
+            self.layer.addSublayer(completedLayer)
+        }
     }
     
-    private func drawIndicatorLayer(){
-        for point in indicatorCenters {
-            let layer = CAShapeLayer()
-            layer.path = UIBezierPath(arcCenter: point, radius: theme.indicatorRadius, startAngle: CGFloat(0.0), endAngle: CGFloat(Double.pi * 2), clockwise: true).cgPath
-            layer.fillColor = theme.inactiveColor.cgColor
-            indicatorLayers.append(layer)
-            self.layer.addSublayer(layer)
+    private func drawIndicatorLayer() {
+        if indicatorLayers.count == 0 {
+            // create and add new layers
+            for point in indicatorCenters {
+                let layer = CAShapeLayer()
+                layer.path = UIBezierPath(arcCenter: point, radius: theme.indicatorRadius, startAngle: CGFloat(0.0), endAngle: CGFloat(Double.pi * 2), clockwise: true).cgPath
+                layer.fillColor = theme.inactiveColor.cgColor
+                indicatorLayers.append(layer)
+                self.layer.addSublayer(layer)
+            }
+        } else {
+            // update the existing layers
+            for index in 0..<indicatorCenters.count {
+                let layer = indicatorLayers[index]
+                let point = indicatorCenters[index]
+                layer.path = UIBezierPath(arcCenter: point, radius: theme.indicatorRadius, startAngle: CGFloat(0.0), endAngle: CGFloat(Double.pi * 2), clockwise: true).cgPath
+            }
         }
+        
     }
     
     private func drawLabels(){
-        for index in 0..<labels.count {
-            let textLayer = CATextLayer()
-            textLayer.foregroundColor = theme.inactiveColor.cgColor
-            
-            let string = labels[index]
-            let centrePoint = indicatorCenters[index]
-            let updatedPoint = CGPoint(x: centrePoint.x - (componentWidth/2), y: centrePoint.y + 10)
-            textLayer.string = string
-            textLayer.font = theme.font
-            textLayer.fontSize = theme.fontSize
-            textLayer.alignmentMode = CATextLayerAlignmentMode.center
-            textLayer.display()
-            textLayer.contentsScale = UIScreen.main.scale
-            textLayer.frame = CGRect(origin: updatedPoint, size: CGSize(width: componentWidth, height: 18))
-            
-            textLayers.append(textLayer)
-            
-            self.layer.addSublayer(textLayer)
+        if textLayers.count == 0 {
+            for index in 0..<labels.count {
+                let textLayer = CATextLayer()
+                textLayer.foregroundColor = theme.inactiveColor.cgColor
+                
+                let string = labels[index]
+                let centrePoint = indicatorCenters[index]
+                let updatedPoint = CGPoint(x: centrePoint.x - (componentWidth/2), y: centrePoint.y + 10)
+                textLayer.string = string
+                textLayer.font = theme.font
+                textLayer.fontSize = theme.fontSize
+                textLayer.alignmentMode = CATextLayerAlignmentMode.center
+                textLayer.display()
+                textLayer.contentsScale = UIScreen.main.scale
+                textLayer.frame = CGRect(origin: updatedPoint, size: CGSize(width: componentWidth, height: 18))
+                
+                textLayers.append(textLayer)
+                
+                self.layer.addSublayer(textLayer)
+            }
+        } else {
+            // update existing
+            for index in 0..<labels.count {
+                let textLayer = textLayers[index]
+                let string = labels[index]
+                let centrePoint = indicatorCenters[index]
+                let updatedPoint = CGPoint(x: centrePoint.x - (componentWidth/2), y: centrePoint.y + 10)
+                textLayer.string = string
+                textLayer.frame = CGRect(origin: updatedPoint, size: CGSize(width: componentWidth, height: 18))
+            }
         }
+        
+        
     }
     
     // MARK: -
@@ -161,6 +202,7 @@ open class TZIndicatorProgressView: UIView {
         if index == _currentIndex {
             return
         }
+        previousIndex = _currentIndex
         _currentIndex = index
         updateLayers()
     }
@@ -187,7 +229,7 @@ open class TZIndicatorProgressView: UIView {
         let activeLayerAnimation = pathAnimation
         let activeEnd = CGFloat(currentIndex)/CGFloat(componentCount)
         activeLayerAnimation.toValue = activeEnd
-        activeLayerAnimation.fromValue = CGFloat(completedIndex)/CGFloat(componentCount)
+        activeLayerAnimation.fromValue = CGFloat(previousIndex)/CGFloat(componentCount)
         activeLayer.add(activeLayerAnimation, forKey: "strokeEndAnimation")
         indicatorLayers[currentIndex].fillColor = theme.activeColor.cgColor
         textLayers[currentIndex].foregroundColor = theme.activeColor.cgColor
@@ -209,9 +251,13 @@ open class TZIndicatorProgressView: UIView {
     
     public func nextIndex() {
         previousCompletedIndex = completedIndex
+        previousIndex = _currentIndex
         _currentIndex += 1
         updateLayers()
     }
 
-    
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        updateLayers()
+    }
 }
